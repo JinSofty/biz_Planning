@@ -32,6 +32,7 @@ GitHub 저장소: https://github.com/JinSofty/biz_Planning
 - [사업 정의](01_business/OVERVIEW.md)
 - [기술구조 기준선](01_business/ARCHITECTURE.md)
 - [확장안과 검증할 방향](01_business/OPTIONS.md)
+- [PowerPoint → SVG 기반 지도 탐색 아이디어](01_business/SVG-MAP-EXPLORATION.md)
 - [결정 기록](03_decisions/DEC-001-architecture-baseline.md)
 - [다른 채팅방 출처와 확인 한계](05_sources/2026-10-21-cross-chat-sources.md)
 
