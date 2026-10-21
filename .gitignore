@@ -1,0 +1,10 @@
+# 로컬 환경과 인증정보
+.DS_Store
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.obsidian/workspace*.json
+private/
+work/
