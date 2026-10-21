@@ -32,3 +32,6 @@ GitHub 저장소: https://github.com/JinSofty/biz_Planning
 - [확장안과 검증할 방향](01_business/OPTIONS.md)
 - [결정 기록](03_decisions/DEC-001-architecture-baseline.md)
 - [다른 채팅방 출처와 확인 한계](05_sources/2026-10-21-cross-chat-sources.md)
+
+## 요소기술 검증
+- [POC-001: 라이브러리 웹서버 DMZ 배치 — 사용자 실행 성공](06_validation/POC-001-library-placement/RESULT.md)

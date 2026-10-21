@@ -3,6 +3,8 @@
 상태: 기존 대화의 제안 정리 / 확정 구현 범위 아님
 
 ## AI Drawing
+
+진행 상황: [POC-001](../06_validation/POC-001-library-placement/RESULT.md)에서 AI 없이 라이브러리 Web 심볼을 DMZ에 자동 배치하는 첫 단계에 성공했다. 로컬 Qwen 명령 해석과 업무·담당자 연결은 후속 검증 대상이다.
 자연어 → AI Planner → 구조화 명령 → Symbol Catalog → 배치·Drawing 실행기 → Draft Preview → 검토·Publish.
 
 LLM은 의도를 해석하고, 실행기는 좌표·아이콘 복제·Element ID·라벨을 처리하는 방향이다. 전용 Symbol Catalog의 이름·별칭·타입과 Library Item을 연결한다. ExcalidrawAutomate 활용은 과거 제안이며 API 지원·호환성을 이번 기록 작업에서 검증하지 않았다. AI가 만든 객체·관계는 곧바로 Registry의 확정 사실이 되지 않는다.
