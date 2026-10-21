@@ -66,39 +66,112 @@ try {
   ea.style.fontFamily = originals.find(e => e.type === "text")?.fontFamily || 1;
   const labelId = ea.addText(0, box.height + 16, "web_007\n10.0.0.250", {textAlign: "center"});
   const label = ea.getElement(labelId);
-  const width = Math.max(box.width, label.width);
-  const height = box.height + 16 + label.height;
-  const pad = 32;
-  const topReserve = 72;
-  if (zone.width < width + pad * 2 || zone.height < height + topReserve + pad) {
-    throw new Error(`DMZ가 작습니다. 최소 ${Math.ceil(width + pad*2)} × ${Math.ceil(height + topReserve + pad)} 크기로 늘려주세요.`);
+  const baseWidth = Math.max(box.width, label.width);
+  const baseHeight = box.height + 16 + label.height;
+  const bounds = es => ea.getBoundingBox(es);
+  const inside = b => b.topX >= zone.x && b.topY >= zone.y &&
+    b.topX + b.width <= zone.x + zone.width && b.topY + b.height <= zone.y + zone.height;
+  // Prefer server metadata; also recognize unmodified library groups by their structure.
+  const candidates = new Map();
+  for (const e of scene) {
+    const meta = e.customData?.arcmapPoc;
+    if (meta?.libraryItemId === ITEM_ID && meta.serverName) {
+      const key = `server:${meta.serverName}`;
+      if (!candidates.has(key)) candidates.set(key, []);
+      candidates.get(key).push(e);
+    }
+    for (const group of e.groupIds || []) {
+      const key = `group:${group}`;
+      if (!candidates.has(key)) candidates.set(key, []);
+      candidates.get(key).push(e);
+    }
   }
-  const left = zone.x + (zone.width - width) / 2;
-  const top = zone.y + topReserve;
-  // 첫 POC는 기존 객체와 겹치면 이동시키지 않고 중단합니다.
-  const overlaps = scene.some(e => {
-    if (e.id === zone.id || e.containerId === zone.id) return false;
-    const b = ea.getBoundingBox([e]);
-    return b.topX < left + width + 8 && b.topX + b.width > left - 8 &&
-      b.topY < top + height + 8 && b.topY + b.height > top - 8;
-  });
-  if (overlaps) throw new Error("배치할 위치에 기존 요소가 있습니다. 빈 DMZ에서 먼저 테스트해주세요.");
-  const dx = left + (width - box.width) / 2 - box.topX;
-  const dy = top - box.topY;
+  const signature = es => es.map(e => e.type + (e.type === "text" ? `:${e.text}` : "")).sort().join("|");
+  const sourceSignature = signature(originals);
+  const sourceBody = bounds(originals.filter(e => e.type !== "text"));
+  const ratios = [];
+  const seen = new Set();
+  for (const [key, es] of candidates) {
+    const knownWeb = key.startsWith("server:") || signature(es) === sourceSignature;
+    // Other server symbols can have different geometry and captions (e.g. "Server").
+    const namedServer = es.some(e => e.type === "text" &&
+      /(?:server|서버|^web$|^was$|^db$)/i.test(e.text || "")) &&
+      es.some(e => e.type !== "text") && !es.some(e => e.id === zone.id);
+    if (!knownWeb && !namedServer) continue;
+    const identity = es.map(e => e.id).sort().join("|");
+    if (seen.has(identity)) continue;
+    seen.add(identity);
+    // Compare the bodies, excluding captions and the IP/name labels.
+    const body = es.filter(e => e.type !== "text");
+    if (!body.length || !inside(bounds(es))) continue;
+    const b = bounds(body);
+    if (inside(b) && b.width > 0 && box.width > 0) ratios.push(b.width / sourceBody.width);
+  }
+  ratios.sort((a, b) => a - b);
+  const preferredScale = ratios.length ? ratios[Math.floor(ratios.length / 2)] : 1;
+  // Reserve proportional margins so small zones remain usable.
+  const pad = Math.min(32, zone.width * 0.05, zone.height * 0.05);
+  const topReserve = Math.min(72, zone.height * 0.18);
+  const area = {x: zone.x + pad, y: zone.y + topReserve,
+    width: zone.width - 2 * pad, height: zone.height - topReserve - pad};
+  if (area.width <= 0 || area.height <= 0 || baseWidth <= 0 || baseHeight <= 0) {
+    throw new Error("DMZ와 라이브러리의 크기는 0보다 커야 합니다.");
+  }
+  const obstacles = scene.filter(e => e.id !== zone.id).map(e => bounds([e]));
+  let placement = null;
+  let scale = Math.min(preferredScale, area.width / baseWidth, area.height / baseHeight);
+  // Candidate positions along obstacle edges find available gaps without moving existing objects.
+  for (let attempt = 0; attempt < 100 && !placement; attempt++, scale *= 0.9) {
+    const width = baseWidth * scale, height = baseHeight * scale;
+    const gap = Math.min(8, 8 * scale);
+    const xs = [area.x, area.x + (area.width - width) / 2];
+    const ys = [area.y];
+    for (const b of obstacles) {
+      xs.push(b.topX + b.width + gap, b.topX - width - gap);
+      ys.push(b.topY + b.height + gap, b.topY - height - gap);
+    }
+    for (const top of ys.sort((a,b) => a-b)) {
+      for (const left of xs.sort((a,b) => a-b)) {
+        if (left < area.x || top < area.y || left + width > area.x + area.width + 1e-8 ||
+            top + height > area.y + area.height + 1e-8) continue;
+        if (obstacles.some(b => b.topX < left + width + gap && b.topX + b.width > left - gap &&
+            b.topY < top + height + gap && b.topY + b.height > top - gap)) continue;
+        placement = {left, top, scale};
+        break;
+      }
+      if (placement) break;
+    }
+  }
+  if (!placement) throw new Error("DMZ에 빈 공간이 없습니다. 기존 객체를 이동하거나 영역을 넓혀주세요.");
+  const {left, top} = placement;
+  scale = placement.scale;
+  // Uniformly scale coordinates, line points and text as one reusable symbol.
   for (const element of elements) {
-    element.x += dx;
-    element.y += dy;
-    ea.elementsDict[element.id] = element;
+    element.x = left + ((baseWidth - box.width) / 2 + element.x - box.topX) * scale;
+    element.y = top + (element.y - box.topY) * scale;
+    element.width *= scale;
+    element.height *= scale;
+    if (element.points) element.points = element.points.map(([x,y]) => [x * scale, y * scale]);
+    if (element.fontSize) element.fontSize *= scale;
+    if (element.strokeWidth) element.strokeWidth *= scale;
+    // Bounds calculation may cache line paths. Invalidate geometry after resizing.
+    element.version += 1;
+    element.versionNonce = Math.floor(Math.random() * 2147483647);
+    element.updated = Date.now();
+    ea.elementsDict[element.id] = JSON.parse(JSON.stringify(element));
   }
-  label.x = left + (width - label.width) / 2;
-  label.y = top + box.height + 16;
+  label.x = left + (baseWidth - label.width) * scale / 2;
+  label.y = top + (box.height + 16) * scale;
+  label.width *= scale;
+  label.height *= scale;
+  if (label.fontSize) label.fontSize *= scale;
   label.customData = {arcmapPoc: {serverName: SERVER_NAME, zoneElementId: zone.id, status: "draft"}};
   const ids = [...elements.map(e => e.id), labelId];
   ea.addToGroup(ids);
   const added = await ea.addElementsToView(false, true, true);
   if (!added) throw new Error("Drawing에 요소를 추가하지 못했습니다.");
   ea.selectElementsInView(ids);
-  notice("web_007 배치 완료. 선택 영역 확대는 Shift+2, 실행 취소는 Cmd+Z입니다.");
+  notice(`web_007 배치 완료 (원본 대비 ${Math.round(scale * 100)}%).${ratios.length && scale < preferredScale - 0.001 ? " 빈 공간에 맞추기 위해 기존 서버보다 작게 배치했습니다." : ""} 선택 영역 확대: Shift+2, 실행 취소: Cmd+Z`);
 } catch (error) {
   notice(`ArcMap: ${error.message || error}`);
 }
