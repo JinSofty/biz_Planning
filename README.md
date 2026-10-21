@@ -25,3 +25,10 @@ GitHub 저장소: https://github.com/JinSofty/biz_Planning
 이 폴더가 로컬 작업본입니다. 커밋은 로컬 이력 저장이며, GitHub 전송 완료 여부는 별도로 확인합니다.
 
 새 대화에서 시작할 때: `이 저장소의 AGENTS.md와 00_context/STATUS.md를 읽고 이어서 진행해줘.`
+
+## 현재 사업·설계 기준
+- [사업 정의](01_business/OVERVIEW.md)
+- [기술구조 기준선](01_business/ARCHITECTURE.md)
+- [확장안과 검증할 방향](01_business/OPTIONS.md)
+- [결정 기록](03_decisions/DEC-001-architecture-baseline.md)
+- [다른 채팅방 출처와 확인 한계](05_sources/2026-10-21-cross-chat-sources.md)
