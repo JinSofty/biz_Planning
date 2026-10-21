@@ -1,37 +1,42 @@
-# Excaliworks 사업 작업실
+# 사업 기획 작업실
 
-아이디어를 구체화하고 주요 결정과 근거를 GitHub에 축적하는 작업 공간입니다.
+여러 사업 아이디어를 구체화하고, 결정의 이유와 검증 결과를 관리하는 범용 저장소입니다. 각 사업은 최상위의 독립된 폴더에서 관리합니다.
 
-## 시작 순서
-1. `00_context/STATUS.md`에서 현재 상태와 다음 작업을 확인합니다.
-2. `01_business/OVERVIEW.md`에서 사업 정의를 확인합니다.
-3. 오늘 주제와 관련된 가설·결정·자료만 추가로 읽습니다.
+## 사업 목록
 
-## 기록 위치
-- `00_context/`: 현재 상태와 작업 방식
-- `01_business/`: 현재 사업 정의
-- `02_hypotheses/`: 검증할 가설과 실험 결과
-- `03_decisions/`: 사용자가 확정한 결정과 변경 이유
-- `04_sessions/`: 대화별 결과와 다음 작업
-- `05_sources/`: 출처와 검토한 자료
-- `templates/`: 반복 사용 서식
+| 폴더 | 사업 | 현재 단계 |
+|---|---|---|
+| [excaliworks/](excaliworks/README.md) | ExcaliWorks — 아키텍처 중심 IT 지식·자산 관리 | 요소기술 검증 중 |
 
-## 저장 방식
-대화 → 문서 초안 → 사용자 확정 사항 반영 → 변경 내용 확인 → 의미 단위로 커밋 → GitHub 전송.
-아이디어와 가설도 커밋할 수 있지만, 커밋 자체가 사업 결정의 확정을 뜻하지는 않습니다.
-주요 결정은 결정 기록에 남기고 관련 사업 문서와 현재 상태를 함께 갱신합니다.
-GitHub 저장소: https://github.com/JinSofty/biz_Planning
+## 기본 구조
 
-이 폴더가 로컬 작업본입니다. 커밋은 로컬 이력 저장이며, GitHub 전송 완료 여부는 별도로 확인합니다.
+```text
+biz_Planning/
+├── README.md          # 사업 목록과 공통 사용법
+├── AGENTS.md          # 공통 협업 원칙
+├── excaliworks/       # ExcaliWorks 기획·결정·검증·코드
+└── another-business/  # 새 사업을 시작할 때 추가하는 동급 폴더
+```
 
-새 대화에서 시작할 때: `이 저장소의 AGENTS.md와 00_context/STATUS.md를 읽고 이어서 진행해줘.`
+`another-business/`는 구조 설명용 예시이며 실제 사업 폴더는 아닙니다.
 
-## 현재 사업·설계 기준
-- [사업 정의](01_business/OVERVIEW.md)
-- [기술구조 기준선](01_business/ARCHITECTURE.md)
-- [확장안과 검증할 방향](01_business/OPTIONS.md)
-- [결정 기록](03_decisions/DEC-001-architecture-baseline.md)
-- [다른 채팅방 출처와 확인 한계](05_sources/2026-10-21-cross-chat-sources.md)
+## 새 사업 시작하기
 
-## 요소기술 검증
-- [POC-001: 라이브러리 웹서버 DMZ 배치 — 사용자 실행 성공](06_validation/POC-001-library-placement/RESULT.md)
+1. 사업 이름으로 최상위 폴더를 만듭니다. 폴더명은 영문 소문자와 하이픈 사용을 권합니다.
+2. 그 안에 `README.md`(사업 소개)와 `00_context/STATUS.md`(현재 상태·다음 작업)를 먼저 만듭니다.
+3. 필요할 때만 `01_business/`, `02_hypotheses/`, `03_decisions/`, `04_sessions/`, `05_sources/`, `06_validation/`를 추가합니다. 실행 코드와 테스트도 해당 사업 안에 둡니다.
+4. 이 문서의 사업 목록에 링크를 추가합니다. ExcaliWorks의 내용이나 확정 사항을 새 사업의 기본값으로 복사하지 않습니다.
+
+## 기록과 저장
+
+- 사업 방향을 바꾸는 결정에는 이유를 남깁니다.
+- 실험에는 결과·근거·아직 확인하지 않은 점을 남깁니다.
+- 현재 상태 문서는 최신 상태와 다음 작업 1~3개를 중심으로 유지합니다.
+- 토의를 마치거나 기능 검증을 완료한 시점에 관련 변경을 묶어 커밋합니다. 단순 질의응답이나 전송·병합 절차는 매번 별도 문서로 만들지 않아도 됩니다.
+- 서로 다른 사업의 변경은 가급적 별도 커밋으로 관리합니다.
+
+새 채팅에서 이어갈 때는 대상 사업을 지정합니다.
+
+> 이 저장소의 AGENTS.md와 excaliworks/AGENTS.md, excaliworks/00_context/STATUS.md를 읽고 ExcaliWorks 작업을 이어서 진행해줘.
+
+기존 ExcaliWorks 문서는 `excaliworks/` 아래로 이동했으며 과거 커밋 이력은 유지됩니다. 기존 루트 문서 URL은 새 경로로 바꾸어 사용합니다.
