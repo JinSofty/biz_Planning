@@ -40,3 +40,6 @@ GitHub 저장소: https://github.com/JinSofty/biz_Planning
 
 ## 요소기술 검증
 - [POC-001: 라이브러리 웹서버 DMZ 배치 — 사용자 실행 성공](06_validation/POC-001-library-placement/RESULT.md)
+
+- [구성도 탐색 UX와 사용자 회사의 문제](01_business/NAVIGATION-UX.md)
+- [Obsidian·Excalidraw 중심 탐색과 장비 팝업 결정](03_decisions/DEC-004-obsidian-navigation-and-device-popup.md)
