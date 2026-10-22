@@ -45,3 +45,5 @@ GitHub 저장소: https://github.com/JinSofty/biz_Planning
 - [Obsidian·Excalidraw 중심 탐색과 장비 팝업 결정](03_decisions/DEC-004-obsidian-navigation-and-device-popup.md)
 
 - [장비·솔루션 메타데이터와 작성 상태 표시 아이디어](01_business/ASSET-METADATA.md)
+
+- [사내 GitLab 콘텐츠 공유와 담당자 중심 운영 결정](03_decisions/DEC-005-internal-gitlab-content-sync.md)
